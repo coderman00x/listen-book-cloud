@@ -1,0 +1,56 @@
+classDiagram
+    class Book {
+        +str id
+        +str title
+        +str original_path
+        +BookStatus status
+        +str voice
+        +str rate
+        +float duration_sec
+        +int size_bytes
+        +int progress
+        +str error
+        +int char_count
+        +str audio_rel_path
+        +str created_at
+        +str updated_at
+    }
+    class Settings {
+        +str default_voice
+        +str default_rate
+    }
+    class TTSEngine {
+        +async generate(text, voice, rate) bytes
+        -chunk_text(text) list~str~
+    }
+    class Store {
+        +save_book(book)
+        +get_book(id) Book
+        +list_books() list~Book~
+        +delete_book(id) bool
+        +save_settings(s)
+        +load_settings() Settings
+    }
+    class GenerationQueue {
+        +enqueue(book_id)
+        +worker_loop()
+        -update_progress(id, pct)
+    }
+    class APIRouter {
+        +import_files()
+        +list_books()
+        +get_book(id)
+        +generate(id, voice, rate)
+        +retry(id)
+        +delete_book(id)
+        +stream_audio(id)
+        +list_voices()
+        +get_settings()
+        +put_settings()
+        +get_progress(id)
+    }
+    Book "1" --> "1" Settings : 默认参数来源
+    APIRouter ..> Store : 读写元数据
+    APIRouter ..> GenerationQueue : enqueue
+    GenerationQueue ..> TTSEngine : 调用生成
+    TTSEngine ..> Book : 写 audio_rel_path

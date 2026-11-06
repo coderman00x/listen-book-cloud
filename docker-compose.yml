@@ -1,0 +1,39 @@
+# 听书宝 v2.0：自有 VPS / NAS 一键部署（可挂持久卷、无休眠）。
+# 用法：cp .env.example .env 并填好 ACCESS_TOKEN，再 docker compose up -d --build
+services:
+  listen-book:
+    build:
+      context: .
+      args:
+        USE_CN_MIRROR: ${USE_CN_MIRROR:-0}
+    image: listen-book:local
+    container_name: listen-book
+    # 宿主端口取 HOST_PORT（默认 8000）；容器端口跟随 PORT，
+    # 与 Dockerfile CMD 的 ${PORT:-8000}、config.PORT 保持一致。
+    ports:
+      - "${HOST_PORT:-8000}:${PORT:-8000}"
+    environment:
+      - PORT=${PORT:-8000}
+      - LISTENBOOK_HOST=0.0.0.0
+      # 公网部署必填；未设置时 /api/health 会返回 warning 提示
+      - ACCESS_TOKEN=${ACCESS_TOKEN:-}
+      # 1 = 公网模式：前端显示公网地址、隐藏容器内网 IP 与二维码
+      - LISTENBOOK_PUBLIC=${LISTENBOOK_PUBLIC:-0}
+      - LISTENBOOK_PUBLIC_URL=${LISTENBOOK_PUBLIC_URL:-}
+      # 固定指向下方挂载点：仍是 app 自身数据目录（红线不变）
+      - LISTENBOOK_DATA_DIR=/app/data
+    volumes:
+      # 持久卷：重启 / 重建容器后书架与音频仍在（免费云平台没有这个能力）
+      - ./data:/app/data
+    restart: unless-stopped
+    healthcheck:
+      # 与 Dockerfile 一致，仅用 Python 标准库，跟随容器内 $PORT
+      test:
+        - CMD
+        - python
+        - -c
+        - "import os, sys, urllib.request; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:' + os.environ.get('PORT', '8000') + '/api/health', timeout=3).status == 200 else 1)"
+      interval: 30s
+      timeout: 5s
+      start_period: 25s
+      retries: 3

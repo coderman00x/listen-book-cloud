@@ -1,0 +1,16 @@
+# 排除本地开发产物与运行期数据，避免把几百 MB 的 venv / node_modules / 测试样本
+# 打进 Docker 构建上下文（也避免本地 venv 的绝对路径污染镜像）。
+backend/venv/
+backend/.venv/
+frontend/node_modules/
+frontend/dist/
+data/
+**/__pycache__/
+**/*.pyc
+.git/
+docs/
+.pytest_cache/
+*.log
+backend/tests/
+.env
+*.zip

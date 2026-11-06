@@ -1,0 +1,38 @@
+sequenceDiagram
+    actor User
+    participant FE as 前端(React)
+    participant API as 后端(FastAPI)
+    participant Q as GenerationQueue
+    participant TTS as TTSEngine(edge-tts)
+    participant Store as Store(JSON)
+    participant FS as data/audio
+
+    Note over User,FS: 流程A：导入 → 生成 → 播放
+    User->>FE: 拖入/选择多个 txt
+    FE->>API: POST /api/books/import (multipart files)
+    API->>Store: 创建 Book(status=pending, original_path 仅记录)
+    API->>Q: enqueue(book_id)
+    API-->>FE: 返回 Book 列表(含 id/status)
+    Q->>Store: status=generating, progress=0
+    loop 每本书 / 每个文本分片
+        Q->>TTS: generate(text, voice, rate)
+        TTS-->>FS: 顺序写入 <id>.mp3 字节(分片拼接)
+        Q->>Store: 更新 progress
+    end
+    TTS-->>Q: 完成
+    Q->>Store: status=done, duration_sec, size_bytes
+    FE->>API: GET /api/books/{id}/progress (轮询)
+    API-->>FE: {status:done, progress:100}
+    User->>FE: 点击播放
+    FE->>API: GET /api/books/{id}/audio (Range)
+    API-->>FE: audio/mpeg 流
+    FE->>FE: <audio> 播放/暂停/倍速
+
+    Note over User,FS: 流程B：删除（仅 app 数据）
+    User->>FE: 点击删除
+    FE->>API: DELETE /api/books/{id}
+    API->>Store: 读取 Book
+    API->>FS: 仅删除 data/audio/<id>.mp3 副本
+    API->>Store: 删除元数据
+    API-->>FE: {deleted:true}
+    Note right of FS: original_path 指向的用户 txt 始终不被读/写/删/移动

@@ -1,0 +1,7 @@
+# 听书宝后端依赖（本地网页应用，需置于 venv 内安装）
+fastapi>=0.110,<0.112
+uvicorn[standard]>=0.29,<0.31
+edge-tts>=7.0
+python-multipart>=0.0.9
+beautifulsoup4>=4.12        # 新增：epub xhtml 正文提取
+pypdf>=4.0                  # 新增：pdf 文本层提取

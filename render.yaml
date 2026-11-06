@@ -1,0 +1,26 @@
+# Render Blueprint：免费 Web Service（Docker runtime，无需信用卡）。
+# 把本仓库推到 GitHub 后，Render 会自动识别根目录 Dockerfile 并构建。
+# 注意：免费层无持久磁盘 + 15 分钟无流量休眠，生成完请立刻导出 mp3 到手机。
+services:
+  - type: web
+    name: listen-book
+    runtime: docker
+    plan: free
+    # Render 对该路径发探活请求（HEAD/GET）；应用同时显式保证 HEAD / 返回 200
+    healthCheckPath: /api/health
+    envVars:
+      # PORT 由 Render 自动注入，此处【不要】声明（声明反而会覆盖平台值）；
+      # Dockerfile 的 CMD 用 ${PORT:-8000}，config.PORT 也优先读标准 PORT。
+      - key: LISTENBOOK_PUBLIC
+        value: "1"
+      # 公网必须自设口令：sync:false = 请在 Render Dashboard 手动填写强口令。
+      # 不设的话任何人都能用你的服务生成音频、占满磁盘，/api/health 也会告警。
+      - key: ACCESS_TOKEN
+        sync: false
+      # 填自己的公网 HTTPS 地址，如 https://listen-book.onrender.com（结尾不带 /）。
+      # 留空时前端回退用当前页面地址；只影响「手机访问」面板展示。
+      - key: LISTENBOOK_PUBLIC_URL
+        sync: false
+      # 免费层无持久磁盘：这里只是 app 自身数据目录，休眠/重启后会被清空（预期行为）
+      - key: LISTENBOOK_DATA_DIR
+        value: /app/data

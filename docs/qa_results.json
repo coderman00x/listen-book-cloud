@@ -1,0 +1,144 @@
+{
+  "summary": {
+    "PASS": 18,
+    "FINDING": 1,
+    "BLOCKED": 1,
+    "INFO": 1,
+    "FAIL": 1
+  },
+  "results": [
+    {
+      "name": "health",
+      "status": "PASS",
+      "detail": "HTTP 200 {'code': 0, 'data': {'ok': True}, 'message': 'ok'}",
+      "route": "NoOne"
+    },
+    {
+      "name": "import_spec_files[]_mismatch",
+      "status": "FINDING",
+      "detail": "文档/任务口径 files[] -> HTTP 422 (实际契约为 files)",
+      "route": "PM"
+    },
+    {
+      "name": "import",
+      "status": "PASS",
+      "detail": "HTTP 200 id=ca84db1d1f1a46ae86e1e066d40dad50 original_path='三体节选.txt' status=pending char_count=360",
+      "route": "NoOne"
+    },
+    {
+      "name": "redline_import_original_untouched",
+      "status": "PASS",
+      "detail": "import前=db408322c39b… import后=db408322c39b… (size/mtime/sha256 全部一致)",
+      "route": "NoOne"
+    },
+    {
+      "name": "redline_copy_exists",
+      "status": "PASS",
+      "detail": "副本=/workspace/listen-book/data/books/ca84db1d1f1a46ae86e1e066d40dad50.txt 存在=True 内容与原始一致=True",
+      "route": "NoOne"
+    },
+    {
+      "name": "generate_endpoint",
+      "status": "PASS",
+      "detail": "{'code': 0, 'data': {'id': 'ca84db1d1f1a46ae86e1e066d40dad50', 'status': 'pending'}, 'message': 'ok'}",
+      "route": "NoOne"
+    },
+    {
+      "name": "generate_terminal_status",
+      "status": "PASS",
+      "detail": "终态=failed (联网阻断下应为 failed；后端失败处理路径正常)",
+      "route": "NoOne"
+    },
+    {
+      "name": "generate_done_artifacts",
+      "status": "BLOCKED",
+      "detail": "真实 edge-tts 联网被阻断(403)，无法生成真实 mp3；后端失败处理正常，非源码 Bug。",
+      "route": "NoOne"
+    },
+    {
+      "name": "audio_fixture_note",
+      "status": "INFO",
+      "detail": "真实 mp3 因 TTS 联网阻断缺失；以 5000B 合成夹具验证音频端点 200/206/Range 逻辑",
+      "route": "NoOne"
+    },
+    {
+      "name": "audio_stream_200",
+      "status": "PASS",
+      "detail": "HTTP 200 Content-Type=audio/mpeg bytes=5000",
+      "route": "NoOne"
+    },
+    {
+      "name": "audio_range_206",
+      "status": "PASS",
+      "detail": "HTTP 206 Content-Range=bytes 0-99/5000 bytes=100",
+      "route": "NoOne"
+    },
+    {
+      "name": "retry_endpoint",
+      "status": "PASS",
+      "detail": "{'code': 0, 'data': {'id': 'ca84db1d1f1a46ae86e1e066d40dad50', 'status': 'pending'}, 'message': 'ok'}",
+      "route": "NoOne"
+    },
+    {
+      "name": "voices_count",
+      "status": "PASS",
+      "detail": "total=5 zh-CN=5 ids=['zh-CN-XiaoxiaoNeural', 'zh-CN-XiaoyiNeural', 'zh-CN-XiaochenNeural', 'zh-CN-YunyangNeural', 'zh-CN-YunxiNeural']",
+      "route": "NoOne"
+    },
+    {
+      "name": "settings_get_default",
+      "status": "PASS",
+      "detail": "{'default_voice': 'zh-CN-XiaoxiaoNeural', 'default_rate': '+0%'}",
+      "route": "NoOne"
+    },
+    {
+      "name": "settings_put_get",
+      "status": "PASS",
+      "detail": "put_code=0 get={'default_voice': 'zh-CN-YunxiNeural', 'default_rate': '+20%'}",
+      "route": "NoOne"
+    },
+    {
+      "name": "settings_file_persisted",
+      "status": "PASS",
+      "detail": "settings.json 已落盘",
+      "route": "NoOne"
+    },
+    {
+      "name": "delete_endpoint",
+      "status": "PASS",
+      "detail": "{'code': 0, 'data': {'deleted': True}, 'message': 'ok'}",
+      "route": "NoOne"
+    },
+    {
+      "name": "delete_files_removed",
+      "status": "PASS",
+      "detail": "mp3_gone=True txt_gone=True",
+      "route": "NoOne"
+    },
+    {
+      "name": "delete_list_excludes_immediate",
+      "status": "PASS",
+      "detail": "列表是否含该书=False",
+      "route": "NoOne"
+    },
+    {
+      "name": "delete_list_excludes_after_settle",
+      "status": "PASS",
+      "detail": "沉淀3s后列表是否含该书=False",
+      "route": "NoOne"
+    },
+    {
+      "name": "redline_delete_original_untouched",
+      "status": "PASS",
+      "detail": "删除前=db408322c39b… 删除后=db408322c39b… (原始文件未被触碰)",
+      "route": "NoOne"
+    },
+    {
+      "name": "delete_race_resurrection_BUG",
+      "status": "FAIL",
+      "detail": "导入后立即删除：删除瞬间列表含该书=False；在途生成结束后列表含该书=True -> 已删除书籍被在途生成任务复活(源码Bug)",
+      "route": "ENGINEER"
+    }
+  ],
+  "origin_sha256": "db408322c39b91cda8a7b828f218f62c64291e64476630b328badc7be222971d"
+}
