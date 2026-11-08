@@ -70,7 +70,7 @@ git push -u origin main
   用户名 + Personal Access Token（不是登录密码）。
 - 推完回到 GitHub 仓库页面刷新，能看到 `Dockerfile`、`backend/`、`frontend/` 就成功了。
 
-> ⚠️ **本步常见坑**：把命令敲在 `/workspace/listen-book` 这个**主项目文件夹**里会失败——
+> ⚠️ **本步常见坑**：别在还没解压的目录、或随手一个空文件夹里敲这两条命令——
 > 那不是 git 仓库，也不要给它 `git init`。命令一定要在**解压出来的那个文件夹**里执行。
 > 另外**不要把 `.env`（含口令）、`data/`、`backend/venv/`、`frontend/node_modules/` 推上去**；
 > 交付包已经排除了它们，别手动往仓库里加。
